@@ -17,14 +17,14 @@ void GameManager::startGame() {
     orderManager->acceptOrder();
     totalDistance = order.distance;
     emit showOrder(order);
-    gameTimer->start(16); // 60 FPS, moved here
+    gameTimer->start(16); 
 }
 
 void GameManager::updateGame() {
     if (orderManager->hasOrder()) {
         double speedKmH = prius->getSpeed();
-        currentDistance += (speedKmH * 16) / (3600 * 1000); // km per 16ms
-        emit updateDistance(currentDistance * 1000, totalDistance * 1000); // meters
+        currentDistance += (speedKmH * 16) / (3600 * 1000); 
+        emit updateDistance(currentDistance * 1000, totalDistance * 1000); 
         emit updateSpeed(speedKmH);
         qDebug() << "Game update: distance" << currentDistance << "km, speed" << speedKmH << "km/h";
 
