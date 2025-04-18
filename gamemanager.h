@@ -25,8 +25,8 @@ private:
     Prius *prius;
     OrderManager *orderManager;
     QTimer *gameTimer;
-    double currentDistance; // km
-    double totalDistance; // km
+    double currentDistance; 
+    double totalDistance; 
     bool orderPending;
 };
 
