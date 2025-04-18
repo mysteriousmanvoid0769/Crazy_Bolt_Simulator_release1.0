@@ -1,0 +1,15 @@
+debug/main.o
+debug/mainwindow.o
+debug/prius.o
+debug/ordermanager.o
+debug/gamemanager.o
+debug/boltwindow.o
+debug/commentwindow.o
+debug/dialogwindow.o
+debug/obstaclecar.o
+debug/moc_mainwindow.o
+debug/moc_ordermanager.o
+debug/moc_gamemanager.o
+debug/moc_boltwindow.o
+debug/moc_commentwindow.o
+debug/moc_dialogwindow.o

@@ -1,0 +1,15 @@
+release/main.o
+release/mainwindow.o
+release/prius.o
+release/ordermanager.o
+release/gamemanager.o
+release/boltwindow.o
+release/commentwindow.o
+release/dialogwindow.o
+release/obstaclecar.o
+release/moc_mainwindow.o
+release/moc_ordermanager.o
+release/moc_gamemanager.o
+release/moc_boltwindow.o
+release/moc_commentwindow.o
+release/moc_dialogwindow.o
