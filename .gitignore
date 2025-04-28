@@ -9,6 +9,7 @@
 /Obj/
 /out/
 /Out/
+*.pro.user
 
 # Лог-файлы
 *.log
