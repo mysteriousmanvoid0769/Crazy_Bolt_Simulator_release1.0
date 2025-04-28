@@ -1,11 +1,9 @@
-// mainwindow.h
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
 #include <QGraphicsScene>
-// #include <QGraphicsView> // Заменено на gameview.h
+
 #include <QGraphicsRectItem>
 #include <QLabel>
 #include <QPushButton>
@@ -17,24 +15,23 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QStyle> // Включен, может быть полезен для стилей
+#include <QStyle>
 
-// Forward declarations
+
 class Prius;
 class GameManager;
 class FuelCan;
-class GameView; // <-- Добавлено Forward declaration для GameView
+class GameView;
 struct Order;
 class QKeyEvent;
 class QShowEvent;
 class QResizeEvent;
 
-// --- Определение ObstacleCar ---
-// (Код ObstacleCar остается без изменений)
+
 class ObstacleCar : public QGraphicsPixmapItem {
 public:
     ObstacleCar(int lane) : carLane(lane) {
-        // ЗАМЕНИТЕ ПУТЬ НА ВАШ!
+
         QPixmap pixmap("C:/Users/iskender/Documents/Crazy_Prius_Simulator_new/pictures/obstacle_car.png");
         if (pixmap.isNull()) {
             qDebug() << "Error: Failed to load obstacle_car.jpg";
@@ -42,29 +39,29 @@ public:
         }
         setPixmap(pixmap.scaled(30, 50, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         qreal laneCenterX;
-        if (lane == 0) laneCenterX = 100; // Центр левой полосы
-        else if (lane == 1) laneCenterX = 200; // Центр средней полосы
-        else laneCenterX = 300; // Центр правой полосы
-        // Устанавливаем позицию так, чтобы центр машины был в центре полосы
-        setPos(laneCenterX - boundingRect().width()/2.0, -100); // Спавн над экраном
+        if (lane == 0) laneCenterX = 100;
+        else if (lane == 1) laneCenterX = 200;
+        else laneCenterX = 300;
+
+        setPos(laneCenterX - boundingRect().width()/2.0, -100);
     }
     void move(int playerSpeed) {
-        // Скорость препятствия = базовая + % от скорости игрока
-        double obstacle_base_speed = 5.0; // Базовая скорость "ползучести"
-        double relative_speed_factor = 0.04; // Коэффициент относительной скорости
+
+        double obstacle_base_speed = 5.0;
+        double relative_speed_factor = 0.04;
         setY(y() + obstacle_base_speed + playerSpeed * relative_speed_factor);
     }
     int lane() const { return carLane; }
 private:
     int carLane;
 };
-// --- Конец ObstacleCar ---
+
 
 
 #include "prius.h"
 #include "gamemanager.h"
 #include "fuelcan.h"
-#include "gameview.h" // <-- Подключаем заголовок нового класса
+#include "gameview.h"
 
 
 class MainWindow : public QMainWindow {
@@ -83,7 +80,7 @@ public slots:
     void clearCommentArea();
 
 private slots:
-    // Основные слоты обновления и управления
+
     void updateMovement();
     void spawnObstacleCar();
     void restartGame();
@@ -95,35 +92,35 @@ private slots:
     void showNewPassengerMessage();
     void delayedStartGame();
 
-    // Слоты для обновления UI
+
     void updateDistanceLabel(double current, int total);
-    void updateRatingLabel(double rating); // Этот слот обновляет только текст
+    void updateRatingLabel(double rating);
     void updateCompletedOrdersLabel(int count);
     void updateTotalDistanceLabel(double totalDistance);
     void updateFuelBar(double fuelPercentage);
     void updateWalletLabel(double newWallet);
-    // Слот для обновления баров скорости и турбо
-    void updateSpeedBar(int speed, bool turboActive); // <--- УБРАН maxSpeed
 
-    // Слоты для оверлея заказа
+    void updateSpeedBar(int speed, bool turboActive);
+
+
     void showOrderOverlay(const Order &order);
     void acceptOrderClicked();
     void rejectOrderClicked();
 
-    // --- Слоты для диалога ---
+
     void onStartDialogClicked();
     void onTellStoryClicked();
     void onComplainClicked();
     void updateDialogButtons(bool enableStart, bool enableStory, bool enableComplain);
     void appendDialogText(const QString& htmlText);
 
-    // --- Слоты Turbo ---
+
     void onTurboUpgradeClicked();
     void updateTurboButton(bool available);
 
 
 private:
-    // Порядок объявления важен для -Wreorder
+
     void setupUI();
     void resetScene();
     void setupOrderOverlay();
@@ -132,63 +129,63 @@ private:
     void setupUpgradeButton();
     void setupSpeedPanel();
 
-    // Графические элементы
+
     QGraphicsScene *scene;
-    GameView *view; // <-- Тип указателя GameView
+    GameView *view;
     Prius *prius;
     QList<QGraphicsRectItem*> dashes;
     QList<ObstacleCar*> obstacleCars;
     QList<FuelCan*> fuelCans;
 
-    // Менеджер игры
+
     GameManager *gameManager;
 
-    // --- Элементы основного UI ---
+
     QWidget* centralWidget;
     QPushButton *restartButton;
     QTextEdit* commentDisplayArea;
 
-    // Нижняя левая панель
+
     QWidget *bottomLeftStatsWidget;
     QLabel *walletLabel;
     QLabel *completedOrdersLabel;
     QLabel *distanceLabel;
     QLabel *totalDistanceLabel;
 
-    // Левая панель
+
     QWidget *leftStatusPanelWidget;
     QProgressBar *speedBar;
     QProgressBar *turboBar;
     QProgressBar *fuelBar;
 
-    // Правая верхняя панель
+
     QWidget *topRightStatusPanelWidget;
     QLabel *ratingIconLabel;
     QLabel *ratingLabel;
 
-    // Оверлей заказа
+
     QWidget *orderOverlayWidget;
     QLabel *orderOverlayLabel;
     QPushButton *acceptButton;
     QPushButton *rejectButton;
 
-    // --- Элементы UI диалога ---
+
     QWidget* dialogButtonContainer;
     QPushButton* startDialogButton;
     QPushButton* tellStoryButton;
     QPushButton* complainButton;
 
-    // --- Элемент UI Turbo ---
+
     QPushButton* turboUpgradeButton;
 
-    // --- Состояние игры ---
+
     bool gameOver;
     bool gamePaused;
     bool obstaclesActive;
     double lastFuelCanSpawnDistance;
-    Order currentDisplayedOrder; // Хранит данные заказа, показанного в оверлее
+    Order currentDisplayedOrder;
 
-    // --- Таймеры ---
+
     QTimer *movementTimer;
     QTimer *spawnTimer;
     QTimer *fuelSpawnTimer;

@@ -6,8 +6,8 @@ FuelCan::FuelCan(int lane) : m_lane(lane) {
     QPixmap fuelPixmap("C:/Users/iskender/Documents/Crazy_Prius_Simulator/pictures/fuel_can.jpg");
     if (fuelPixmap.isNull()) {
         qDebug() << "Error: Failed to load fuel_can.jpg - using default size for collision detection";
-        // Если изображение не загрузилось, задаём размер для корректной коллизии
-        setPixmap(QPixmap(30, 30)); // Пустой QPixmap с заданным размером
+
+        setPixmap(QPixmap(30, 30));
     } else {
         setPixmap(fuelPixmap.scaled(30, 30));
     }

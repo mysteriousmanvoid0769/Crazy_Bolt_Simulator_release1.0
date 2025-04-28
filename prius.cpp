@@ -2,16 +2,16 @@
 #include <QDebug>
 #include <QPixmap>
 
-// Передаем parent в конструктор QGraphicsPixmapItem
+
 // Убедимся, что инициализация в списке верная
 Prius::Prius(QGraphicsItem *parent)
     : QGraphicsPixmapItem(parent),
     speed(0),
     currentLane(Lane::Middle),
-    maxSpeed(DEFAULT_MAX_SPEED), // Используем static const
+    maxSpeed(DEFAULT_MAX_SPEED),
     turboActive(false)
 {
-    // ЗАМЕНИТЕ ПУТЬ НА ВАШ!
+
     QPixmap pixmap("C:/Users/iskender/Documents/Crazy_Prius_Simulator/pictures/prius2.jpg");
     if (pixmap.isNull()) {
         qDebug() << "Error: Failed to load prius.jpg";
@@ -21,7 +21,7 @@ Prius::Prius(QGraphicsItem *parent)
     setPixmap(pixmap.scaled(30, 50, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     setLanePosition(currentLane);
-    qDebug() << "Prius initialized in lane:" << static_cast<int>(currentLane) << "at X:" << x() << "Max Speed:" << maxSpeed; // Лог для проверки
+    qDebug() << "Prius initialized in lane:" << static_cast<int>(currentLane) << "at X:" << x() << "Max Speed:" << maxSpeed;
 }
 
 void Prius::accelerate() {
@@ -58,10 +58,10 @@ Lane Prius::getCurrentLane() const {
     return currentLane;
 }
 
-// --- Методы для Turbo ---
+
 void Prius::activateTurbo() {
     if (!turboActive) {
-        maxSpeed = TURBO_MAX_SPEED; // Используем static const
+        maxSpeed = TURBO_MAX_SPEED;
         turboActive = true;
         qDebug() << "Prius: Turbo Activated! Max speed:" << maxSpeed;
     }
@@ -69,15 +69,15 @@ void Prius::activateTurbo() {
 
 void Prius::deactivateTurbo() {
     if (turboActive) {
-        maxSpeed = DEFAULT_MAX_SPEED; // Используем static const
+        maxSpeed = DEFAULT_MAX_SPEED;
         turboActive = false;
         if (speed > maxSpeed) {
             speed = maxSpeed;
         }
         qDebug() << "Prius: Turbo Deactivated. Max speed:" << maxSpeed << "Current speed:" << speed;
     } else {
-        // Если турбо не было активно, просто убедимся, что скорость правильная
-        // (на случай если проблема инициализации в другом месте)
+
+
         if (maxSpeed != DEFAULT_MAX_SPEED) {
             qDebug() << "Prius: Warning - deactivateTurbo called but maxSpeed was not DEFAULT. Resetting.";
             maxSpeed = DEFAULT_MAX_SPEED;
@@ -95,7 +95,7 @@ bool Prius::isTurboActive() const {
 int Prius::getMaxSpeed() const {
     return maxSpeed;
 }
-// --- Конец методов для Turbo ---
+
 
 
 void Prius::setLanePosition(Lane lane) {

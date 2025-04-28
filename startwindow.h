@@ -3,10 +3,10 @@
 
 #include <QWidget>
 
-// Forward declarations
+
 class QLabel;
 class QPushButton;
-class MainWindow; // Нужно для создания главного окна
+class MainWindow;
 
 class StartWindow : public QWidget
 {
@@ -21,7 +21,7 @@ private slots:
     void onAboutClicked();
 
 private:
-    void setupUi(); // Приватный метод для настройки интерфейса
+    void setupUi();
 
     QLabel *titleLabel;
     QLabel *subtitleLabel;
@@ -29,7 +29,7 @@ private:
     QPushButton *aboutButton;
     QLabel *authorsLabel;
 
-    MainWindow *mainWindow = nullptr; // Указатель на главное окно игры
+    MainWindow *mainWindow = nullptr;
 };
 
 #endif // STARTWINDOW_H
