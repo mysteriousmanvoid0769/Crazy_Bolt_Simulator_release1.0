@@ -87,6 +87,7 @@ _UpgradeReport_Files/
 *.sdf
 *.xcodeproj
 *.xcworkspace
+*.pro.user
 
 # --- Если используется Python (например, для скриптов сборки) ---
 *.pyc

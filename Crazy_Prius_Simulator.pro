@@ -1,4 +1,5 @@
 QT += core gui widgets
+QT += core gui widgets multimedia
 CONFIG += c++11
 SOURCES += main.cpp mainwindow.cpp prius.cpp ordermanager.cpp gamemanager.cpp commentwindow.cpp \
     fuelcan.cpp \

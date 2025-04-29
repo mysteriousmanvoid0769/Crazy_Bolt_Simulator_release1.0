@@ -850,13 +850,14 @@ void MainWindow::updateDialogButtons(bool enableStart, bool enableStory, bool en
 void MainWindow::appendDialogText(const QString &htmlText) { if (commentDisplayArea) { commentDisplayArea->append(htmlText); } }
 void MainWindow::clearCommentArea() { if (commentDisplayArea) { commentDisplayArea->clear(); qDebug() << "MainWindow: Comment area cleared."; } }
 
-
 void MainWindow::showGameOverMessage(QString message) {
-
-    qDebug() << "Game over message received:" << message;
+    qDebug() << "Game over/win message received:" << message;
     if (gameOver) return;
     gameOver = true; gamePaused = true;
 
+     QString winMessage = "Поздравляем! Ваши будни в такси окончены. Возвращайтесь на Рублевку";
+    bool isWin = (message == winMessage);
+    qDebug() << "Is Win Condition?" << isWin;
 
     if (orderOverlayWidget) orderOverlayWidget->setVisible(false);
     if (commentDisplayArea) commentDisplayArea->setVisible(false);
@@ -867,20 +868,22 @@ void MainWindow::showGameOverMessage(QString message) {
     if (spawnTimer) spawnTimer->stop();
     if (fuelSpawnTimer) fuelSpawnTimer->stop();
 
+    bool fatalGameOver = !isWin && (message.contains("Ахмед") || message.contains("fired") || message.contains("закончилось топливо") || message.contains("насмерть")); // Фатальный только при проигрыше
 
-    bool fatalGameOver = (message.contains("Ахмед") || message.contains("fired") || message.contains("закончилось топливо") || message.contains("насмерть"));
-
-    if (!fatalGameOver && restartButton) {
-        restartButton->setVisible(true); positionManuallyPlacedWidgets(); restartButton->setFocus();
-    } else if(restartButton) {
+    if (!fatalGameOver && !isWin && restartButton) {
+        restartButton->setVisible(true);
+        positionManuallyPlacedWidgets();
+        restartButton->setFocus();
+    } else if (restartButton) {
         restartButton->setVisible(false);
     }
 
-
     QMessageBox msgBox(this);
-    msgBox.setIcon(QMessageBox::Warning); msgBox.setWindowTitle("Game Over"); msgBox.setText(message); msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setIcon(isWin ? QMessageBox::Information : QMessageBox::Warning);
+    msgBox.setWindowTitle(isWin ? "Победа!" : "Game Over");
+    msgBox.setText(message);
+    msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.exec();
-
     if (fatalGameOver) {
         QApplication::quit();
     }

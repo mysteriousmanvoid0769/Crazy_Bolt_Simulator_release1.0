@@ -11,7 +11,7 @@ void OrderManager::generateOrder() {
     if (isFirstOrder) {
 
         generatedOrder.distance = 600;
-        generatedOrder.price = 6.0;
+        generatedOrder.price = 18.0;
         generatedOrder.payment = "Card";
         qDebug() << "Generating first order (600m, 3.0 AZN, Card)";
     } else {
