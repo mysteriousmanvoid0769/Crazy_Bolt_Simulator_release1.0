@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    QString backgroundImagePath = "C:/Users/iskender/Documents/Crazy_Prius_Simulator/pictures/sky_background.jpg";
+    QString backgroundImagePath = "../../pictures/sky_background.jpg";
 
     this->setStyleSheet(QString("MainWindow { border-image: url(%1) 0 0 0 0 stretch stretch; }")
                             .arg(backgroundImagePath));
@@ -272,7 +272,7 @@ void MainWindow::setupUI() {
     topRightStatusPanelWidget->setStyleSheet("background-color: rgba(0, 0, 0, 170); border-radius: 5px; padding: 2px;");
     ratingIconLabel = new QLabel(topRightStatusPanelWidget);
 
-    QString starIconPath = "C:/Users/iskender/Documents/Crazy_Prius_Simulator/pictures/star.jpg";
+    QString starIconPath = "../../pictures/star.jpg";
     QPixmap starPixmap(starIconPath);
     if (!starPixmap.isNull()) {
         ratingIconLabel->setPixmap(starPixmap.scaled(18, 18, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -707,11 +707,11 @@ void MainWindow::spawnObstacleCar() {
 
     if (!obstaclesActive || gameOver || gamePaused || !scene) return;
 
-    int maxObstaclesOnScreen = 3;
+    constexpr int maxObstaclesOnScreen = 37;
     if (obstacleCars.size() >= maxObstaclesOnScreen) return;
 
 
-    if (QRandomGenerator::global()->bounded(100) < 70) return;
+    if (QRandomGenerator::global()->bounded(100) < 0) return;
 
     int lane = QRandomGenerator::global()->bounded(3);
     qreal spawnY = -100.0;
@@ -850,14 +850,13 @@ void MainWindow::updateDialogButtons(bool enableStart, bool enableStory, bool en
 void MainWindow::appendDialogText(const QString &htmlText) { if (commentDisplayArea) { commentDisplayArea->append(htmlText); } }
 void MainWindow::clearCommentArea() { if (commentDisplayArea) { commentDisplayArea->clear(); qDebug() << "MainWindow: Comment area cleared."; } }
 
+
 void MainWindow::showGameOverMessage(QString message) {
-    qDebug() << "Game over/win message received:" << message;
+
+    qDebug() << "Game over message received:" << message;
     if (gameOver) return;
     gameOver = true; gamePaused = true;
 
-     QString winMessage = "Поздравляем! Ваши будни в такси окончены. Возвращайтесь на Рублевку";
-    bool isWin = (message == winMessage);
-    qDebug() << "Is Win Condition?" << isWin;
 
     if (orderOverlayWidget) orderOverlayWidget->setVisible(false);
     if (commentDisplayArea) commentDisplayArea->setVisible(false);
@@ -868,22 +867,20 @@ void MainWindow::showGameOverMessage(QString message) {
     if (spawnTimer) spawnTimer->stop();
     if (fuelSpawnTimer) fuelSpawnTimer->stop();
 
-    bool fatalGameOver = !isWin && (message.contains("Ахмед") || message.contains("fired") || message.contains("закончилось топливо") || message.contains("насмерть")); // Фатальный только при проигрыше
 
-    if (!fatalGameOver && !isWin && restartButton) {
-        restartButton->setVisible(true);
-        positionManuallyPlacedWidgets();
-        restartButton->setFocus();
-    } else if (restartButton) {
+    bool fatalGameOver = (message.contains("Ахмед") || message.contains("fired") || message.contains("закончилось топливо") || message.contains("насмерть"));
+
+    if (!fatalGameOver && restartButton) {
+        restartButton->setVisible(true); positionManuallyPlacedWidgets(); restartButton->setFocus();
+    } else if(restartButton) {
         restartButton->setVisible(false);
     }
 
+
     QMessageBox msgBox(this);
-    msgBox.setIcon(isWin ? QMessageBox::Information : QMessageBox::Warning);
-    msgBox.setWindowTitle(isWin ? "Победа!" : "Game Over");
-    msgBox.setText(message);
-    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setIcon(QMessageBox::Warning); msgBox.setWindowTitle("Game Over"); msgBox.setText(message); msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.exec();
+
     if (fatalGameOver) {
         QApplication::quit();
     }

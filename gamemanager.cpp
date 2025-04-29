@@ -7,8 +7,6 @@
 #include <QRandomGenerator>
 #include <QMetaObject>
 #include <algorithm>
-#include <QSoundEffect>
-#include <QUrl>
 
 GameManager::GameManager(MainWindow *window, Prius *prius, QObject *parent)
     : QObject(parent), mainWindow(window), prius(prius), orderManager(new OrderManager(this)),
@@ -21,42 +19,16 @@ GameManager::GameManager(MainWindow *window, Prius *prius, QObject *parent)
     dialogStoryUsed(false),
     dialogComplainUsed(false),
     passengerReceptive(false),
-    dialogInteractionStarted(false),
-    newOrderSound(nullptr),
-    winSound(nullptr),
-    fatalCrashSound(nullptr),
-    debtGameOverSound(nullptr)
+    dialogInteractionStarted(false)
 {
     QTimer *updateTimer = new QTimer(this);
     connect(updateTimer, &QTimer::timeout, this, &GameManager::updateDistanceInternal);
     updateTimer->start(16);
 
     connect(orderManager, &OrderManager::orderGenerated, this, [this](const Order &order) {
-        if (newOrderSound && newOrderSound->isLoaded()) {
-            newOrderSound->play();
-        } else {
-            qDebug() << "New order sound not loaded or null!";
-        }
-
         emit showOrder(order);
         qDebug() << "Order generated signal received, emitting showOrder:" << order.distance << "m," << order.price << "AZN," << order.payment;
     });
-
-    newOrderSound = new QSoundEffect(this);
-    newOrderSound->setSource(QUrl::fromLocalFile("C:/Users/iskender/Documents/Crazy_Prius_Simulator_new/sounds/order_sound.wav"));
-    newOrderSound->setVolume(0.7);
-
-    winSound = new QSoundEffect(this);
-    winSound->setSource(QUrl::fromLocalFile("C:/Users/iskender/Documents/Crazy_Prius_Simulator_new/sounds/pobeda.wav"));
-    winSound->setVolume(0.9);
-
-    fatalCrashSound = new QSoundEffect(this);
-    fatalCrashSound->setSource(QUrl::fromLocalFile("C:/Users/iskender/Documents/Crazy_Prius_Simulator_new/sounds/avariya.wav"));
-    fatalCrashSound->setVolume(1.0);
-
-    debtGameOverSound = new QSoundEffect(this);
-    debtGameOverSound->setSource(QUrl::fromLocalFile("C:/Users/iskender/Documents/Crazy_Prius_Simulator_new/sounds/gde_dengi.wav"));
-    debtGameOverSound->setVolume(0.9);
 
     qDebug() << "GameManager initialized...";
     emit ratingUpdated(rating);
@@ -134,6 +106,7 @@ void GameManager::resetForRestart() {
     checkTurboAvailability();
 
     emit distanceUpdated(distance, totalDistance); emit fuelUpdated(fuelLevel);
+
     emit updateCompletedOrdersCount(completedOrders); emit ratingUpdated(rating); emit walletUpdated(wallet);
 }
 
@@ -146,12 +119,15 @@ OrderManager* GameManager::get_orderManager() const { return orderManager; }
 bool GameManager::hasActiveOrder() const { return totalDistance > 0; }
 double GameManager::getWallet() const { return wallet; }
 
+
 int GameManager::getCompletedOrders() const {
     return completedOrders;
 }
 
+
 void GameManager::setRating(double newRating) {
     rating = std::max(0.0, std::min(newRating, MAX_RATING));
+
     rating = round(rating * 100.0) / 100.0;
     qDebug() << "Rating set to:" << rating;
     emit ratingUpdated(rating);
@@ -191,28 +167,39 @@ void GameManager::updateDistanceInternal() {
     }
     emit totalDistanceUpdated(totalDistanceDriven);
 
+
+
     if (hasActiveOrder()) {
         QString autoComment = "";
         QString autoCommentHtmlTag = QString("<font color=\"gray\">[%1]</font>");
         QString vomitCommentHtmlTag = QString("<font color=\"orange\">Пассажир: %1</font>");
+
 
         if (prius->isTurboActive() && speed >= 175 && currentSpeedCommentState != SCS_Vomit) {
             autoComment = "АААААААА!!! (пассажир вырвал в салон)";
             currentSpeedCommentState = SCS_Vomit;
             blockDefaultEndComment = true;
         }
+
         else if (currentSpeedCommentState != SCS_Vomit && speed > 100 && currentSpeedCommentState != SCS_Speeding) {
             autoComment = "помедленнее!";
             currentSpeedCommentState = SCS_Speeding;
             blockDefaultEndComment = true;
         }
+
         else if (currentSpeedCommentState == SCS_Speeding && speed <= 90) {
             autoComment = "да, вот так хорошо";
             currentSpeedCommentState = SCS_None;
         }
+
+
+
+
+
         else if (currentSpeedCommentState == SCS_Vomit && speed < 150) {
             currentSpeedCommentState = SCS_None;
         }
+
 
         if (!autoComment.isEmpty() && autoComment != lastComment) {
             if (currentSpeedCommentState == SCS_Vomit) {
@@ -224,6 +211,9 @@ void GameManager::updateDistanceInternal() {
         }
     }
 
+
+
+
     if (pendingOrderAfter500m) {
         distanceSinceNewOrder += distanceIncrement;
         if (distanceSinceNewOrder >= 500) {
@@ -233,6 +223,7 @@ void GameManager::updateDistanceInternal() {
                 distance = totalDistance;
                 processOrderCompletion();
             }
+
             pendingOrderAfter500m = false;
             distanceSinceNewOrder = 0.0;
             currentOrder = pendingOrder;
@@ -252,9 +243,12 @@ void GameManager::updateDistanceInternal() {
         }
     }
 
+
+
     if (hasActiveOrder() && distance >= totalDistance && !pendingOrderAfter500m) {
         processOrderCompletion();
     }
+
 
     if (!hasActiveOrder() && !hasPendingOrder && !pendingOrderAfter500m && !paused && !(mainWindow && mainWindow->isGameOver())) {
         qDebug() << "No active or pending order, pausing game to generate next order.";
@@ -277,6 +271,7 @@ void GameManager::consumeFuel(double distanceIncrement) {
         fuelLevel = std::max(0.0, fuelLevel);
         emit fuelUpdated(fuelLevel);
 
+
         if (fuelLevel <= 0 && !(mainWindow && mainWindow->isGameOver())) {
             emit gameEndedWithMessage("У вас закончилось топливо, вы не заехали на Азпетроль");
             qDebug() << "Game Over: Fuel ran out!";
@@ -285,6 +280,7 @@ void GameManager::consumeFuel(double distanceIncrement) {
 }
 
 void GameManager::acceptPendingOrder(const Order &order) {
+
     if (!hasPendingOrder) {
         pendingOrder = order;
         hasPendingOrder = true;
@@ -300,10 +296,12 @@ void GameManager::onOrderAccepted(const Order &order) {
         orderManager->confirmFirstOrderAccepted();
     }
 
+
     if (!hasActiveOrder() && !pendingOrderAfter500m) {
         currentOrder = order;
         totalDistance = static_cast<int>(order.distance);
         distance = 0.0;
+
         emit newPassenger();
         emit startObstacles();
         emit orderStarted();
@@ -313,6 +311,7 @@ void GameManager::onOrderAccepted(const Order &order) {
         lastComment = "";
         currentSpeedCommentState = SCS_None;
     }
+
     else if (hasActiveOrder() && !hasPendingOrder) {
         pendingOrder = order;
         hasPendingOrder = true;
@@ -320,9 +319,11 @@ void GameManager::onOrderAccepted(const Order &order) {
         distanceSinceNewOrder = 0.0;
         qDebug() << "New order accepted while previous active, will activate after driving 500m.";
     }
+
     else {
         qDebug() << "Warning: Order accepted in unexpected state (hasActive=" << hasActiveOrder()
         << ", hasPending=" << hasPendingOrder << ", pending500m=" << pendingOrderAfter500m << ").";
+
         if(!hasPendingOrder) {
             pendingOrder = order;
             hasPendingOrder = true;
@@ -339,22 +340,28 @@ void GameManager::processOrderCompletion() {
     }
     qDebug() << "Processing completion for order: " << currentOrder.distance << "m, price:" << currentOrder.price;
 
+
     double tip = calculateTip();
     addMoney(currentOrder.price + tip);
     setRating(rating + RATING_PER_ORDER);
     completedOrders++;
     emit updateCompletedOrdersCount(completedOrders);
 
+
     Order completedOrder = currentOrder;
+
     distance = 0.0;
     totalDistance = 0;
     currentOrder = Order();
+
+
 
     if (!blockDefaultEndComment && !dialogInteractionStarted) {
         QString endComment = "спасибо. до свидания!";
         emit updateDialogDisplayHtml(QString("<font color=\"white\">Пассажир: %1</font>").arg(endComment));
         lastComment = endComment;
     }
+
     blockDefaultEndComment = false;
     dialogInteractionStarted = false;
     currentSpeedCommentState = SCS_None;
@@ -365,10 +372,15 @@ void GameManager::processOrderCompletion() {
              << " New Rating:" << rating << ". Total completed orders:" << completedOrders;
     qDebug() << "DEBUG: processOrderCompletion END";
 
+
     if (!hasPendingOrder) {
         qDebug() << "Order completed. No pending order, will pause game to generate next in update loop.";
+
+
+
     } else {
         qDebug() << "Order completed. Pending order exists, will activate after 500m.";
+
     }
 }
 
@@ -384,9 +396,11 @@ double GameManager::calculateTip() {
 void GameManager::onOrderFailed() {
     qDebug() << "Order failed / rejected in GameManager.";
     if (orderManager) {
+
         orderManager->rejectOrder();
     }
     decreaseRatingOnReject();
+
     if (orderManager) {
         orderManager->generateOrder();
     }
@@ -399,16 +413,13 @@ void GameManager::onCollision() {
     bool turboWasActive = prius->isTurboActive();
     int collisionSpeed = prius->getSpeed();
 
+
     if (turboWasActive && collisionSpeed >= 175) {
         qDebug() << "FATAL CRASH with Turbo at speed:" << collisionSpeed;
-        if (fatalCrashSound && fatalCrashSound->isLoaded()) {
-            fatalCrashSound->play();
-        } else {
-            qDebug() << "Fatal crash sound not loaded or null!";
-        }
         emit gameEndedWithMessage("Вы разбились насмерть");
         return;
     }
+
 
     QString collisionComment = "эта поездка была ужасная!";
     emit updateDialogDisplayHtml(QString("<font color=\"white\">Пассажир: %1</font>").arg(collisionComment));
@@ -416,12 +427,15 @@ void GameManager::onCollision() {
     blockDefaultEndComment = true;
     currentSpeedCommentState = SCS_None;
 
+
     emit updateDialogButtonStates(false, false, false);
     dialogInteractionStarted = true;
     passengerReceptive = false;
 
+
     setRating(rating - RATING_PENALTY_CRASH);
     deductMoney(5.0);
+
 
     if (turboWasActive) {
         qDebug() << "Collision: Turbo upgrade deactivated.";
@@ -429,11 +443,14 @@ void GameManager::onCollision() {
         checkTurboAvailability();
     }
 
+
     if (rating >= MIN_RATING_GAME_OVER && wallet >= MIN_WALLET_GAME_OVER && !(mainWindow && mainWindow->isGameOver())) {
         emit gameEndedWithMessage("Crashed! Restart to continue. Passenger is unhappy.");
         qDebug() << "Collision occurred, game paused for restart.";
     }
+
 }
+
 
 void GameManager::decreaseRatingOnReject() {
     qDebug() << "Decreasing rating due to order rejection.";
@@ -441,6 +458,7 @@ void GameManager::decreaseRatingOnReject() {
 }
 
 void GameManager::resumeGame() {
+
     paused = false;
     qDebug() << "GameManager::resumeGame called, internal paused flag set to false.";
 }
@@ -451,18 +469,6 @@ void GameManager::addMoney(double amount) {
         wallet = round(wallet * 100.0) / 100.0;
         qDebug() << "Wallet updated: +" << amount << " AZN. New balance:" << wallet;
         emit walletUpdated(wallet);
-
-        if (wallet >= 15.0 && !(mainWindow && mainWindow->isGameOver())) {
-            qDebug() << "Win condition met! Wallet >= 15 AZN.";
-            if (winSound && winSound->isLoaded()) {
-                winSound->play();
-            } else {
-                qDebug() << "Win sound not loaded or null!";
-            }
-            emit gameEndedWithMessage("Поздравляем! Ваши будни в такси окончены. Возвращайтесь на Рублевку");
-            return;
-        }
-
         checkTurboAvailability();
     }
 }
@@ -479,15 +485,10 @@ void GameManager::deductMoney(double amount) {
 }
 
 void GameManager::checkDebtLimit() {
+
     if (wallet < MIN_WALLET_GAME_OVER && !(mainWindow && mainWindow->isGameOver())) {
-        if (debtGameOverSound && debtGameOverSound->isLoaded()) {
-            debtGameOverSound->play();
-        } else {
-            qDebug() << "Debt game over sound not loaded or null!";
-        }
         emit gameEndedWithMessage("Ахмед пришел возвращать долги, ваш приус сломали и вы остаетесь без машины");
         qDebug() << "Game Over: Debt exceeded " << MIN_WALLET_GAME_OVER << " AZN.";
-        return;
     }
 }
 
@@ -504,6 +505,7 @@ void GameManager::checkTurboAvailability() {
 
 void GameManager::purchaseTurboUpgrade() {
     qDebug() << "GM Slot: purchaseTurboUpgrade called.";
+
     if (prius && !prius->isTurboActive() && wallet >= TURBO_COST) {
         qDebug() << "Attempting to purchase Turbo...";
         deductMoney(TURBO_COST);
@@ -516,8 +518,10 @@ void GameManager::purchaseTurboUpgrade() {
     }
 }
 
+
 void GameManager::onPlayerInitiatedDialog() {
     qDebug() << "GM Slot: onPlayerInitiatedDialog called.";
+
     if (dialogStartUsed || !hasActiveOrder() || paused ) {
         qDebug() << "GM Slot: Cannot start dialog now (Used/NoOrder/Paused):"
                  << dialogStartUsed << !hasActiveOrder() << paused;
@@ -528,6 +532,7 @@ void GameManager::onPlayerInitiatedDialog() {
     QString driverLine = "Блин, эта работа в такси так надоела";
     emit updateDialogDisplayHtml(QString("<font color=\"red\">Я: %1</font>").arg(driverLine));
     emit updateDialogButtonStates(false, false, false);
+
 
     QTimer::singleShot(1500, this, [this](){
         if (!hasActiveOrder()) return;
@@ -540,19 +545,24 @@ void GameManager::onPlayerInitiatedDialog() {
             enableOthers = false;
             qDebug() << "GM: Passenger response - Not Interested";
             dialogInteractionStarted = false;
+
+
         } else {
             passengerReceptive = true;
             passengerResponse = "Понимаю";
             enableOthers = true;
             qDebug() << "GM: Passenger response - Interested";
         }
+
         emit updateDialogDisplayHtml(QString("<font color=\"white\">Пассажир: %1</font>").arg(passengerResponse));
+
         emit updateDialogButtonStates(false, enableOthers && !dialogStoryUsed, enableOthers && !dialogComplainUsed);
     });
 }
 
 void GameManager::onPlayerToldStory() {
     qDebug() << "GM Slot: onPlayerToldStory called.";
+
     if (dialogStoryUsed || !dialogInteractionStarted || !passengerReceptive || !hasActiveOrder() || paused) {
         qDebug() << "GM Slot: Cannot tell story now. State:" << dialogStoryUsed << !dialogInteractionStarted << !passengerReceptive << !hasActiveOrder() << paused;
         return;
@@ -560,7 +570,9 @@ void GameManager::onPlayerToldStory() {
     dialogStoryUsed = true;
     QString driverLine = "Вообще-то у меня есть свой бизнес на Рублевке, такси это просто хобби";
     emit updateDialogDisplayHtml(QString("<font color=\"red\">Я: %1</font>").arg(driverLine));
+
     emit updateDialogButtonStates(false, false, !dialogComplainUsed && passengerReceptive);
+
     QTimer::singleShot(800, this, [this](){
         if (!hasActiveOrder()) return;
         QString passengerResponse = "Очень круто, что у вас есть страсть!";
@@ -570,6 +582,7 @@ void GameManager::onPlayerToldStory() {
 
 void GameManager::onPlayerComplained() {
     qDebug() << "GM Slot: onPlayerComplained called.";
+
     if (dialogComplainUsed || !dialogInteractionStarted || !passengerReceptive || !hasActiveOrder() || paused) {
         qDebug() << "GM Slot: Cannot complain now. State:" << dialogComplainUsed << !dialogInteractionStarted << !passengerReceptive << !hasActiveOrder() << paused;
         return;
@@ -577,7 +590,9 @@ void GameManager::onPlayerComplained() {
     dialogComplainUsed = true;
     QString driverLine = "Все машины на дороге такие твари, не люблю водить машину";
     emit updateDialogDisplayHtml(QString("<font color=\"red\">Я: %1</font>").arg(driverLine));
+
     emit updateDialogButtonStates(false, !dialogStoryUsed && passengerReceptive, false);
+
     QTimer::singleShot(800, this, [this](){
         if (!hasActiveOrder()) return;
         QString passengerResponse = "Тяжелая у вас работа...";

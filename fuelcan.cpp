@@ -3,7 +3,7 @@
 #include <QDebug>
 
 FuelCan::FuelCan(int lane) : m_lane(lane) {
-    QPixmap fuelPixmap("C:/Users/iskender/Documents/Crazy_Prius_Simulator/pictures/fuel_can.jpg");
+    QPixmap fuelPixmap("../../pictures/fuel_can.jpg");
     if (fuelPixmap.isNull()) {
         qDebug() << "Error: Failed to load fuel_can.jpg - using default size for collision detection";
 

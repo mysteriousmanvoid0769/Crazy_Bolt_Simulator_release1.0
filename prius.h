@@ -42,10 +42,8 @@ private:
     const qreal ROAD_LEFT_EDGE = 50;
 
 
-
-
-    static const int DEFAULT_MAX_SPEED = 120;
-    static const int TURBO_MAX_SPEED = 180;
+    static constexpr int DEFAULT_MAX_SPEED = 120;
+    static constexpr int TURBO_MAX_SPEED = 180;
 };
 
 #endif // PRIUS_H

@@ -32,7 +32,7 @@ class ObstacleCar : public QGraphicsPixmapItem {
 public:
     ObstacleCar(int lane) : carLane(lane) {
 
-        QPixmap pixmap("C:/Users/iskender/Documents/Crazy_Prius_Simulator_new/pictures/obstacle_car.png");
+        QPixmap pixmap("../../pictures/obstacle_car.png");
         if (pixmap.isNull()) {
             qDebug() << "Error: Failed to load obstacle_car.jpg";
             pixmap = QPixmap(30, 50); pixmap.fill(Qt::blue);
