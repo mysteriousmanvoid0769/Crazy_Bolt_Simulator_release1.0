@@ -707,11 +707,11 @@ void MainWindow::spawnObstacleCar() {
 
     if (!obstaclesActive || gameOver || gamePaused || !scene) return;
 
-    constexpr int maxObstaclesOnScreen = 37;
+    constexpr int maxObstaclesOnScreen = 6;
     if (obstacleCars.size() >= maxObstaclesOnScreen) return;
 
 
-    if (QRandomGenerator::global()->bounded(100) < 0) return;
+    if (QRandomGenerator::global()->bounded(100) < 10) return;
 
     int lane = QRandomGenerator::global()->bounded(3);
     qreal spawnY = -100.0;
