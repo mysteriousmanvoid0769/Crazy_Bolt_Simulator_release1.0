@@ -41,7 +41,7 @@ void StartWindow::setupUi()
     subtitleLabel = new QLabel("(игра про болт такси в Азербайджане)", this);
     startButton = new QPushButton("Старт", this);
     aboutButton = new QPushButton("Об игре", this);
-    authorsLabel = new QLabel("Авторы: Iskender Guliyev, Mehraj Chalabov", this);
+    authorsLabel = new QLabel("Авторы: Iskender Guliyev, Chalabov Mehradj", this);
 
 
     QFont titleFont = titleLabel->font();

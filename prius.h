@@ -38,8 +38,8 @@ private:
     qreal getCenterXForLane(Lane lane);
 
 
-    const qreal LANE_WIDTH = 100;
-    const qreal ROAD_LEFT_EDGE = 50;
+    static constexpr qreal LANE_WIDTH = 100;
+    static constexpr qreal ROAD_LEFT_EDGE = 50;
 
 
     static constexpr int DEFAULT_MAX_SPEED = 120;

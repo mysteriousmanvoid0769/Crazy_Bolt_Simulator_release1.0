@@ -1,0 +1,15 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+    <file>pictures/Prius2.jpg</file>
+    <file>pictures/obstacle_car.png</file>
+    <file>pictures/star.jpg</file>
+    <file>pictures/fuel_can.jpg</file>
+    <file>pictures/sky_background.jpg</file>
+    <file>sounds/order_sound.wav</file>
+    <file>sounds/pobeda.wav</file>
+    <file>sounds/avariya.wav</file>
+    <file>sounds/gde_dengi.wav</file>
+    <file>sounds/background_music.mp3</file> 
+
+</qresource>
+</RCC>
