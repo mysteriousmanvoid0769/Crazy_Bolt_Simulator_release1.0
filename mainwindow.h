@@ -40,7 +40,7 @@ public:
             qDebug() << "Error: Failed to load obstacle_car resource ':/pictures/obstacle_car.png'";
             pixmap = QPixmap(30, 50); pixmap.fill(Qt::blue);
         }
-        setPixmap(pixmap.scaled(30, 50, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        setPixmap(pixmap.scaled(300, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         qreal laneCenterX;
         if (lane == 0) laneCenterX = 100;
         else if (lane == 1) laneCenterX = 200;
